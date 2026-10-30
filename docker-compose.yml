@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: jobs
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d jobs"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+  api:
+    build: .
+    ports: ["8080:8080"]
+    environment:
+      DATABASE_URL: postgres://app:app@postgres:5432/jobs?sslmode=disable
+      REDIS_URL: redis://redis:6379/0
+      WORKERS: "4"
+      RATE_LIMIT: "60"
+      RATE_WINDOW: 1m
+      PROVIDER_FAIL_RATE: "0.3"
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_started }

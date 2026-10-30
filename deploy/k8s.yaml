@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: ai-job-gateway, labels: { app: ai-job-gateway } }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: ai-job-gateway } }
+  template:
+    metadata: { labels: { app: ai-job-gateway } }
+    spec:
+      securityContext: { runAsNonRoot: true }
+      containers:
+        - name: api
+          image: ghcr.io/n1912004/go-ai-job-gateway:latest
+          ports: [{ containerPort: 8080 }]
+          envFrom: [{ secretRef: { name: ai-job-gateway-env } }] # DATABASE_URL, REDIS_URL
+          resources:
+            requests: { cpu: 50m, memory: 32Mi }
+            limits: { cpu: 500m, memory: 128Mi }
+          readinessProbe: { httpGet: { path: /readyz, port: 8080 }, periodSeconds: 5 }
+          livenessProbe: { httpGet: { path: /healthz, port: 8080 }, periodSeconds: 10 }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: ai-job-gateway }
+spec:
+  selector: { app: ai-job-gateway }
+  ports: [{ port: 80, targetPort: 8080 }]
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: { name: ai-job-gateway }
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: ai-job-gateway }
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource: { name: cpu, target: { type: Utilization, averageUtilization: 70 } }
