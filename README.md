@@ -1,5 +1,7 @@
 # go-ai-job-gateway
 
+[![ci](https://github.com/N1912004/UPDATE_CV_2026/actions/workflows/ci.yml/badge.svg)](https://github.com/N1912004/UPDATE_CV_2026/actions/workflows/ci.yml)
+
 A small, production-shaped **Go backend for consumer AI mobile apps**: clients submit long-running AI jobs
 (translate, summarise, image processing…), the API answers immediately with a job id, a goroutine worker pool
 executes the job against a provider chain with **fallback routing**, and the client either polls or subscribes
