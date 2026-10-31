@@ -26,6 +26,6 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name == 'push' }}
-          tags: ghcr.io/${{ github.repository }}:latest
+          tags: ghcr.io/n1912004/update_cv_2026:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
