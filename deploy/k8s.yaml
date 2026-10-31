@@ -10,7 +10,7 @@ spec:
       securityContext: { runAsNonRoot: true }
       containers:
         - name: api
-          image: ghcr.io/n1912004/go-ai-job-gateway:latest
+          image: ghcr.io/n1912004/update_cv_2026:latest
           ports: [{ containerPort: 8080 }]
           envFrom: [{ secretRef: { name: ai-job-gateway-env } }] # DATABASE_URL, REDIS_URL
           resources:
